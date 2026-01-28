@@ -16,6 +16,7 @@ class Node:
 def astar_search(maze, start, goal):
     open_list = []
     closed_list = []
+    explored_frames = []
 
     start_node = Node(start)
     goal_node = Node(goal)
@@ -27,13 +28,14 @@ def astar_search(maze, start, goal):
         open_list.remove(current_node)
         closed_list.append(current_node)
 
+        explored_frames.append(current_node.position)
+
         if current_node == goal_node:
-            return reconstruct_path(current_node)
+            path = reconstruct_path(current_node)
+            return path, explored_frames
 
-        neighbors = get_neighbors(current_node.position, maze)
-
-        for next_position in neighbors:
-            neighbor = Node(next_position, current_node)
+        for pos in get_neighbors(current_node.position, maze):
+            neighbor = Node(pos, current_node)
 
             if neighbor in closed_list:
                 continue
@@ -45,7 +47,7 @@ def astar_search(maze, start, goal):
             if add_to_open(open_list, neighbor):
                 open_list.append(neighbor)
 
-    return None
+    return None, explored_frames
 
 
 def add_to_open(open_list, neighbor):
@@ -57,8 +59,7 @@ def add_to_open(open_list, neighbor):
 
 def reconstruct_path(node):
     path = []
-    current = node
-    while current:
-        path.append(current.position)
-        current = current.parent
+    while node:
+        path.append(node.position)
+        node = node.parent
     return path[::-1]
